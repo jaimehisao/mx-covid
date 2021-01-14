@@ -15,4 +15,4 @@ jobs:
         docker login docker.pkg.github.com -u ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
         docker build . --file Dockerfile --tag covid-tracker
         docker tag covid-tracker docker.pkg.github.com/jaimehisao/mx-covid/covid-tracker
-        docker push docker.pkg.github.com/jaimehisao/covid-covid/covid-tracker
+        docker push docker.pkg.github.com/jaimehisao/mx-covid/covid-tracker
