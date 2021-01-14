@@ -14,5 +14,5 @@ jobs:
       run: |
         docker login docker.pkg.github.com -u ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
         docker build . --file Dockerfile --tag covid-mx
-        docker tag frontend docker.pkg.github.com/jaimehisao/covid-mx
+        docker tag covid-mx docker.pkg.github.com/jaimehisao/covid-mx
         docker push docker.pkg.github.com/googleinterns/jaimehisao/covid-mx
