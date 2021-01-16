@@ -1,10 +1,8 @@
 import csv
 import xlrd
-import pymongo
-import time
 
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
+client = MongoClient('services.hisao.org', 27017)
 db = client.salud
 col = db.covid
 
@@ -66,8 +64,7 @@ with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
 with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
-
-    covid_cases = []
+    already_added = 0
 
     for row in csv_reader:
         if line_count == 0:
@@ -119,14 +116,11 @@ with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
             else:
                 case["pais_origen"] = row[36].strip()
             case["uci"] = si_no[row[37]].strip()
-            #print(case)
-            #time.sleep(1000)
-            col.insert_one(case)
-            #covid_cases.append(case)
-            line_count += 1
-            print(line_count)
-    print(len(covid_cases))
-
-
-
-            #print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
+            res = col.find({"_id": case["_id"]}).count()
+            if res != 0:
+                col.insert_one(case)
+                already_added += 1
+            else:
+                line_count += 1
+            print("New entries: " + line_count)
+            print("Already added entries: " + already_added)
