@@ -1,7 +1,7 @@
-from pymongo import MongoClient
 import csv
-import xlrd
 
+import xlrd
+from pymongo import MongoClient
 
 client = MongoClient("services.hisao.org", 27017)
 db = client.salud
