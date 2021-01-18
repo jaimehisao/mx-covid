@@ -2,15 +2,16 @@ import csv
 import xlrd
 
 from pymongo import MongoClient
-client = MongoClient('services.hisao.org', 27017)
+
+client = MongoClient("services.hisao.org", 27017)
 db = client.salud
 col = db.covid
 
-with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
+with open("covid.csv", encoding="ISO-8859-1") as csv_file:
     wb = xlrd.open_workbook("catalogos.xlsx")
     sheet = wb.sheet_by_index(0)  # Origen
     origen = {}
-    for i in range(1,sheet.nrows):
+    for i in range(1, sheet.nrows):
         origen[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
     sheet = wb.sheet_by_index(1)  # Sector
@@ -26,7 +27,8 @@ with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
     sheet = wb.sheet_by_index(3)  # Tipo Paciente
     tipo_paciente = {}
     for i in range(1, sheet.nrows):
-        tipo_paciente[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+        tipo_paciente[str(int(sheet.cell_value(i, 0)))] = \
+            sheet.cell_value(i, 1)
 
     sheet = wb.sheet_by_index(4)  # Si/No
     si_no = {}
@@ -58,11 +60,12 @@ with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
 
     for i in range(1, sheet.nrows):
         municipios.setdefault(str(int(sheet.cell_value(i, 2))), {})[
-            str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+            str(int(sheet.cell_value(i, 0)))
+        ] = sheet.cell_value(i, 1)
     print(municipios)
 
-with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
+with open("covid.csv", encoding="ISO-8859-1") as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=",")
     line_count = 0
     already_added = 0
 
@@ -81,7 +84,9 @@ with open('covid.csv', encoding = "ISO-8859-1") as csv_file:
             case["entidad_nacimiento"] = entidades[str(int(row[6]))].strip()
             case["entidad_residencia"] = entidades[str(int(row[7]))].strip()
             try:
-                case["municipio"] = municipios[str(int(row[7])).strip()][str(int(row[8]))].strip()
+                case["municipio"] = municipios[str(int(row[7])).strip()][
+                    str(int(row[8]))
+                ].strip()
             except Exception:
                 case["municipio"] = "NO ESPECIFICADO"
             case["tipo_paciente"] = tipo_paciente[row[9]].strip()
