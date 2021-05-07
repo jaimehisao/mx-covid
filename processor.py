@@ -75,7 +75,7 @@ def process():
     with open("covid.csv", encoding="ISO-8859-1") as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
         line_count = 0
-        already_added = 0
+        newly_added = 0
 
         for row in csv_reader:
             if line_count == 0:
@@ -86,7 +86,11 @@ def process():
                 case["fecha_actualizado"] = row[0].strip()
                 case["_id"] = row[1].strip()
                 case["origen"] = origen[row[2]].strip()
-                case["sector"] = sector[row[3]].strip()
+                try:
+                    case["sector"] = sector[row[3]].strip()
+                except KeyError:
+                    case["sector"] = '99'
+                    print("Key error in sector, defaulting to 99")
                 case["entidad_um"] = entidades[str(int(row[4]))].strip()
                 case["sexo"] = sexo[row[5]].strip()
                 case["entidad_nacimiento"] = entidades[str(int(row[6]))].strip()
@@ -134,9 +138,9 @@ def process():
                 res = col.count_documents({"_id": case["_id"]})
                 if res == 0:
                     col.insert_one(case)
-                    already_added += 1
+                    newly_added += 1
                 else:
                     line_count += 1
                 # print(1)
-                print("New entries: " + str(line_count))
-                print("Already added entries: " + str(already_added))
+                print("New entries: " + str(newly_added))
+                print("Total entries: " + str(line_count))
