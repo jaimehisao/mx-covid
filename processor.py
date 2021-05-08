@@ -10,77 +10,90 @@ def process():
     db = client.salud
     col = db.covid
 
-    with open("covid.csv", encoding="ISO-8859-1") as csv_file:
-        wb = xlrd.open_workbook("catalogos.xlsx")
-        sheet = wb.sheet_by_index(0)  # Origen
-        origen = {}
-        for i in range(1, sheet.nrows):
-            origen[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    workbook_items_to_add = []
+    db_items = {}
+    already_added = 0
+    read_items = 0
+    # Retrive the entirety of the database, only the ID's
+    # existing_ids = col.find().distinct('_id')
+    for x in col.find({}, {"_id": 1}):
+        db_items[x["_id"]] = 1
+        # database_items.append(x)
+        # print(type(x))
+        # print(x)
 
-        sheet = wb.sheet_by_index(1)  # Sector
-        sector = {}
-        for i in range(1, sheet.nrows):
-            sector[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    # for item in database_items:
+    # database_items_dict = dict.fromkeys(database_items)
+    print('retrieved all IDs from database, which summed up to ' + str(len(db_items)))
 
-        sheet = wb.sheet_by_index(2)  # Sexo
-        sexo = {}
-        for i in range(1, sheet.nrows):
-            sexo[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    wb = xlrd.open_workbook("catalogos.xlsx")
+    sheet = wb.sheet_by_index(0)  # Origen
+    origen = {}
+    for i in range(1, sheet.nrows):
+        origen[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(3)  # Tipo Paciente
-        tipo_paciente = {}
-        for i in range(1, sheet.nrows):
-            tipo_paciente[str(int(sheet.cell_value(i, 0)))] = \
-                sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(1)  # Sector
+    sector = {}
+    for i in range(1, sheet.nrows):
+        sector[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(4)  # Si/No
-        si_no = {}
-        for i in range(1, sheet.nrows):
-            si_no[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(2)  # Sexo
+    sexo = {}
+    for i in range(1, sheet.nrows):
+        sexo[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(5)  # Nacionalidad
-        nacionalidad = {}
-        for i in range(1, sheet.nrows):
-            nacionalidad[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(3)  # Tipo Paciente
+    tipo_paciente = {}
+    for i in range(1, sheet.nrows):
+        tipo_paciente[str(int(sheet.cell_value(i, 0)))] = \
+            sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(6)  # Resultado Lab
-        res_lab = {}
-        for i in range(2, sheet.nrows):
-            res_lab[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(4)  # Si/No
+    si_no = {}
+    for i in range(1, sheet.nrows):
+        si_no[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(7)  # Resultado Antigeno
-        res_antigeno = {}
-        for i in range(2, sheet.nrows):
-            res_antigeno[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(5)  # Nacionalidad
+    nacionalidad = {}
+    for i in range(1, sheet.nrows):
+        nacionalidad[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(8)  # Clasf Final
-        clasf_final = {}
-        for i in range(3, sheet.nrows):
-            clasf_final[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(6)  # Resultado Lab
+    res_lab = {}
+    for i in range(2, sheet.nrows):
+        res_lab[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(9)  # Entidades
-        entidades = {}
-        for i in range(1, sheet.nrows):
-            entidades[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+    sheet = wb.sheet_by_index(7)  # Resultado Antigeno
+    res_antigeno = {}
+    for i in range(2, sheet.nrows):
+        res_antigeno[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        sheet = wb.sheet_by_index(10)  # Municipios
-        municipios = {}
+    sheet = wb.sheet_by_index(8)  # Clasf Final
+    clasf_final = {}
+    for i in range(3, sheet.nrows):
+        clasf_final[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
 
-        for i in range(1, sheet.nrows):
-            municipios.setdefault(str(int(sheet.cell_value(i, 2))), {})[
-                str(int(sheet.cell_value(i, 0)))
-            ] = sheet.cell_value(i, 1)
-        print(municipios)
+    sheet = wb.sheet_by_index(9)  # Entidades
+    entidades = {}
+    for i in range(1, sheet.nrows):
+        entidades[str(int(sheet.cell_value(i, 0)))] = sheet.cell_value(i, 1)
+
+    sheet = wb.sheet_by_index(10)  # Municipios
+    municipios = {}
+
+    for i in range(1, sheet.nrows):
+        municipios.setdefault(str(int(sheet.cell_value(i, 2))), {})[
+            str(int(sheet.cell_value(i, 0)))
+        ] = sheet.cell_value(i, 1)
+    # print(municipios)
 
     with open("covid.csv", encoding="ISO-8859-1") as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
-        line_count = 0
-        newly_added = 0
 
         for row in csv_reader:
-            if line_count == 0:
-                print(f'Column names are {", ".join(row)}')
-                line_count += 1
+            if read_items == 0:
+                # print(f'Column names are {", ".join(row)}')
+                read_items += 1
             else:
                 case = {}
                 case["fecha_actualizado"] = row[0].strip()
@@ -90,7 +103,7 @@ def process():
                     case["sector"] = sector[row[3]].strip()
                 except KeyError:
                     case["sector"] = '99'
-                    print("Key error in sector, defaulting to 99")
+                    print("Key error in sector, defaulting to 99, in item #" + str(read_items))
                 case["entidad_um"] = entidades[str(int(row[4]))].strip()
                 case["sexo"] = sexo[row[5]].strip()
                 case["entidad_nacimiento"] = entidades[str(int(row[6]))].strip()
@@ -135,12 +148,30 @@ def process():
                 else:
                     case["pais_origen"] = row[38].strip()
                 case["uci"] = si_no[row[39]].strip()
-                res = col.count_documents({"_id": case["_id"]})
-                if res == 0:
-                    col.insert_one(case)
-                    newly_added += 1
+
+                read_items += 1
+
+                if case["_id"] not in db_items.keys():
+                    workbook_items_to_add.append(case)
                 else:
-                    line_count += 1
-                # print(1)
-                print("New entries: " + str(newly_added))
-                print("Total entries: " + str(line_count))
+                    already_added += 1
+                '''
+                if any(case["_id"] == elem["_id"] for elem in database_items):
+                    already_added += 1
+                else:
+                    workbook_items_to_add.append(case)
+                    newly_added += 1
+                '''
+    csv_file.close()
+
+    if len(workbook_items_to_add) != 0:
+        print('Inserting to database ' + str(len(workbook_items_to_add)) + ' items')
+        col.insert_many(workbook_items_to_add)
+    else:
+        print('Not inserting since there are no new items.')
+
+    print("Items read from file: " + str(read_items))
+    print("Retrieved entries from database: " + str(len(db_items)))
+    print("Already added entries: " + str(already_added))
+    print("New entries: " + str(len(workbook_items_to_add)))
+
